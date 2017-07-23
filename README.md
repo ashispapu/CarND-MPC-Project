@@ -2,6 +2,65 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## Objective :
+This is the fifth/last project of Term-2 . The objective of this project is to run a car in the simulator track autonomously using Model Predictive Controller .
+
+## Implementation
+
+### The Model
+
+The Model used in this project is a simple Kinematic Model consisting of Vehicle State and Actuators. However this model does not take into consideration effects of wind, tire friction, inertia  for simulator .This model includes the vehicle's x and y coordinates, orientation angle (psi), and velocity, as well as the cross-track error and psi error (epsi). Actuator outputs are acceleration and delta (steering angle). The model combines the state and actuations from the previous timestep to calculate the state for the current timestep based on the equations below:
+
+
+Equations for the model are:
+
+```
+x_[t+1] = x[t] + v[t] * cos(psi[t]) * dt
+y_[t+1] = y[t] + v[t] * sin(psi[t]) * dt
+psi_[t+1] = psi[t] + v[t] / Lf * delta[t] * dt
+v_[t+1] = v[t] + a[t] * dt
+cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
+epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
+```
+
+where
+- x,y: car's location
+- psi: car's direction
+- v: velocity of the car
+- cte: cross track error
+- epsi: error in car's orientation
+
+### State
+
+The state vector is [x, y, psi, v, delta, a], where
+
+- x: car's x position
+- y: car;s y position
+- psi: car's heading angle
+- v: car's velocity
+- delta: steering angle of the car
+- a: throttle on the car
+
+### Actuators
+
+- delta: steering angle
+- a: throttle
+
+### Timestep Length and Elapsed Duration (N & dt)
+
+The values chosen for N and dt are 10 and 0.1, respectively. Hyperparameters N and dt were chosen manually by trial and error. These values mean that the optimizer is considering a one-second duration in which to determine a corrective trajectory. Many other combinations of N and dt were also tried , however didn't yield better result .This N*dt (0.1 *10) gives 1 second, so our predictive controller only predicts the set of states for next 1 second. 
+
+### Polynomial Fitting and MPC Preprocessing
+
+A 3rd degree polynomial is fitted to waypoints .The waypoints are preprocessed by transforming them to the vehicle's perspective and hence applying the polynomial  fit becomes easier .
+
+### Model Predictive Control with Latency 
+
+Here in MPC, we also consider the real world latency and implemented this in a tricky way .Two set of actuations are averaged to handle the latency ,the real actuations for next step and the next predicted actuation after dt which is 0.1 second(100 ms) in this case.
+
+## Result
+
+[![](track.png)]( )
 
 ## Dependencies
 
@@ -29,20 +88,9 @@ Self-Driving Car Engineer Nanodegree Program
   * Linux: `sudo apt-get install gfortran`. Additionall you have also have to install gcc and g++, `sudo apt-get install gcc g++`. Look in [this Dockerfile](https://github.com/udacity/CarND-MPC-Quizzes/blob/master/Dockerfile) for more info.
 * [Ipopt](https://projects.coin-or.org/Ipopt)
   * Mac: `brew install ipopt`
-       +  Some Mac users have experienced the following error:
-       ```
-       Listening to port 4567
-       Connected!!!
-       mpc(4561,0x7ffff1eed3c0) malloc: *** error for object 0x7f911e007600: incorrect checksum for freed object
-       - object was probably modified after being freed.
-       *** set a breakpoint in malloc_error_break to debug
-       ```
-       This error has been resolved by updrading ipopt with
-       ```brew upgrade ipopt --with-openblas```
-       per this [forum post](https://discussions.udacity.com/t/incorrect-checksum-for-freed-object/313433/19).
   * Linux
     * You will need a version of Ipopt 3.12.1 or higher. The version available through `apt-get` is 3.11.x. If you can get that version to work great but if not there's a script `install_ipopt.sh` that will install Ipopt. You just need to download the source from the Ipopt [releases page](https://www.coin-or.org/download/source/Ipopt/) or the [Github releases](https://github.com/coin-or/Ipopt/releases) page.
-    * Then call `install_ipopt.sh` with the source directory as the first argument, ex: `sudo bash install_ipopt.sh Ipopt-3.12.1`. 
+    * Then call `install_ipopt.sh` with the source directory as the first argument, ex: `bash install_ipopt.sh Ipopt-3.12.1`. 
   * Windows: TODO. If you can use the Linux subsystem and follow the Linux instructions.
 * [CppAD](https://www.coin-or.org/CppAD/)
   * Mac: `brew install cppad`
