@@ -60,7 +60,7 @@ Here in MPC, we also consider the real world latency and implemented this in a t
 
 ## Result
 
-[![](track.png)]( )
+[![](track_MPC.png)]( )
 
 ## Dependencies
 
