@@ -56,7 +56,7 @@ A 3rd degree polynomial is fitted to waypoints .The waypoints are preprocessed b
 
 ### Model Predictive Control with Latency 
 
-Here in MPC, we also consider the real world latency and implemented this in a tricky way .Two set of actuations are averaged to handle the latency ,the real actuations for next step and the next predicted actuation after dt which is 0.1 second(100 ms) in this case.
+Here in MPC, we also consider the real world latency and implemented this in a tricky way .Two set of actuations are averaged to handle the latency i.e the real actuations for next step and the next predicted actuation after dt which is 0.1 second(100 ms) in this case.
 
 ## Result
 
